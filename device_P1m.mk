@@ -28,7 +28,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.service.debuggable=1 \
     persist.sys.root_access=0 \
     ro.sys.fw.bg_apps_limits=5
-    
+
+#HIDL
+PRODUCT_COPY_FILES += \
+         device/lenovo/P1m/manifest.xml:system/vendor/manifest.xml
+
 # Log control prop
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.ril.log=0 \
@@ -49,6 +53,9 @@ PRODUCT_PACKAGES += \
 
 # Audio
 PRODUCT_PACKAGES += \
+    android.hardware.audio@2.0-impl \
+    android.hardware.audio.effect@2.0-impl \
+    android.hardware.audio@2.0-service \
     audio.r_submix.default \
     libaudio-resampler \
     libtinyalsa \
@@ -69,11 +76,14 @@ PRODUCT_COPY_FILES += \
 
 # Wifi
 PRODUCT_PACKAGES += \
+    android.hardware.wifi@1.0-service \
     libwpa_client \
     hostapd \
+    wificond \
     dhcpcd.conf \
     wpa_supplicant \
     wpa_supplicant.conf
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/hostapd/hostapd_default.conf:system/etc/hostapd/hostapd_default.conf \
     $(LOCAL_PATH)/configs/hostapd/hostapd.accept:system/etc/hostapd/hostapd.accept \
@@ -83,7 +93,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/ecc_list.xml:system/etc/ecc_list.xml \
     $(LOCAL_PATH)/configs/spn-conf.xml:system/etc/spn-conf.xml
-    
+
 # Display
 PRODUCT_PACKAGES += \
     libion
@@ -129,11 +139,11 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/permissions/android.hardware.microphone.xml:system/etc/permissions/android.hardware.microphone.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml 
 
-    
+
 PRODUCT_PACKAGES += \
     librs_jni \
     com.android.future.usb.accessory
-    
+
 # Charger Mode
 PRODUCT_PACKAGES += \
     charger_res_images
@@ -143,6 +153,7 @@ PRODUCT_COPY_FILES += \
 
 # FM Radio
 PRODUCT_PACKAGES += \
+    android.hardware.broadcastradio@1.0-impl \
     FMRadio \
     libfmjni
 
@@ -157,11 +168,97 @@ PRODUCT_PACKAGES += \
 
 $(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
 
-## CM14 mtk symbols
+# CM14 mtk symbols
 PRODUCT_PACKAGES += \
     libmtk_symbols
 
-## GPS
+# GPS
 PRODUCT_PACKAGES += \
     gps.mt6735m \
     YGPS
+
+
+# Bluetooth
+PRODUCT_PACKAGES += \
+    android.hardware.bluetooth@1.0-impl \
+    android.hardware.bluetooth@1.0-service
+
+# Camera HAL
+PRODUCT_PACKAGES += \
+    camera.device@1.0-impl \
+    camera.device@3.2-impl \
+    android.hardware.camera.provider@2.4-impl \
+    android.hardware.camera.provider@2.4-service
+
+# Vibrator
+PRODUCT_PACKAGES += \
+    android.hardware.vibrator@1.0-impl \
+    android.hardware.vibrator@1.0-service
+    
+# Keymaster HAL
+PRODUCT_PACKAGES += \
+    android.hardware.keymaster@3.0-impl
+    
+# Gatekeeper HAL
+PRODUCT_PACKAGES += \
+    android.hardware.gatekeeper@1.0-impl \
+    android.hardware.gatekeeper@1.0-service
+
+# Lights
+PRODUCT_PACKAGES += \
+    lights.mt6737m
+    
+# Sensors HAL
+PRODUCT_PACKAGES += \
+    android.hardware.light@2.0-impl \
+    android.hardware.light@2.0-service \
+    android.hardware.sensors@1.0-impl \
+    android.hardware.sensors@1.0-service \
+   
+# Drm HAL 
+PRODUCT_PACKAGES += \
+    android.hardware.drm@1.0-impl
+    
+# GPS HAL
+PRODUCT_PACKAGES += \
+    android.hardware.gnss@1.0-impl
+    
+# GPS force mode
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.force.gps.mode=gnss
+    
+# USB HAL
+PRODUCT_PACKAGES += \
+    android.hardware.usb@1.0-service
+    
+# Health HAL
+PRODUCT_PACKAGES += \
+    android.hardware.health@1.0-impl \
+    android.hardware.health@1.0-service
+    
+# Power HAL
+PRODUCT_PACKAGES += \
+    android.hardware.power@1.0-impl
+    
+# Graphic HAL
+PRODUCT_PACKAGES += \
+    android.hardware.graphics.allocator@2.0-impl \
+    android.hardware.graphics.allocator@2.0-service \
+    android.hardware.graphics.composer@2.1-impl \
+    android.hardware.graphics.mapper@2.0-impl \
+    android.hardware.renderscript@1.0-impl \
+    android.hardware.memtrack@1.0-impl \
+    libgralloc_extra \
+    libgui_ext \
+    libui_ext
+    
+# Omx HAL
+PRODUCT_PACKAGES += \
+    android.hardware.media.omx@1.0
+
+# Disable adb security
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+	ro.mount.fs=EXT4 \
+	ro.allow.mock.location=0 \
+	ro.debuggable=1 \
+	ro.config.low_ram=false
