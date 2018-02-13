@@ -1,0 +1,114 @@
+diff --git a/private/app.te b/private/app.te
+index fe03692..cff067a 100644
+--- a/private/app.te
++++ b/private/app.te
+@@ -291,8 +291,8 @@ use_keystore({ appdomain -isolated_app -ephemeral_app })
+ allow appdomain console_device:chr_file { read write };
+ 
+ # only allow unprivileged socket ioctl commands
+-allowxperm { appdomain -bluetooth } self:{ rawip_socket tcp_socket udp_socket }
+-  ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
++#allowxperm { appdomain -bluetooth } self:{ rawip_socket tcp_socket udp_socket }
++#  ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
+ 
+ allow { appdomain -isolated_app } ion_device:chr_file rw_file_perms;
+ # TODO is write really necessary ?
+diff --git a/private/priv_app.te b/private/priv_app.te
+index 60fb411..5cff5b3 100644
+--- a/private/priv_app.te
++++ b/private/priv_app.te
+@@ -85,7 +85,7 @@ r_dir_file(priv_app, rootfs)
+ allow priv_app config_gz:file { open read getattr };
+ 
+ # access the mac address
+-allowxperm priv_app self:udp_socket ioctl SIOCGIFHWADDR;
++#allowxperm priv_app self:udp_socket ioctl SIOCGIFHWADDR;
+ 
+ # Allow GMS core to communicate with update_engine for A/B update.
+ binder_call(priv_app, update_engine)
+diff --git a/public/domain.te b/public/domain.te
+index 858e7c6..affe837 100644
+--- a/public/domain.te
++++ b/public/domain.te
+@@ -200,17 +200,17 @@ allow domain fs_type:dir getattr;
+ # defaults for all processes. Note that granting this whitelist to domain does
+ # not grant the ioctl permission on these socket types. That must be granted
+ # separately.
+-allowxperm domain domain:{ rawip_socket tcp_socket udp_socket }
+-  ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
++#allowxperm domain domain:{ rawip_socket tcp_socket udp_socket }
++#  ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
+ # default whitelist for unix sockets.
+-allowxperm domain domain:{ unix_dgram_socket unix_stream_socket }
+-  ioctl unpriv_unix_sock_ioctls;
++#allowxperm domain domain:{ unix_dgram_socket unix_stream_socket }
++#  ioctl unpriv_unix_sock_ioctls;
+ 
+ # Restrict PTYs to only whitelisted ioctls.
+ # Note that granting this whitelist to domain does
+ # not grant the wider ioctl permission. That must be granted
+ # separately.
+-allowxperm domain devpts:chr_file ioctl unpriv_tty_ioctls;
++#allowxperm domain devpts:chr_file ioctl unpriv_tty_ioctls;
+ 
+ # Workaround for policy compiler being too aggressive and removing hwservice_manager_type
+ # when it's not explicitly used in allow rules
+@@ -227,12 +227,12 @@ with_asan(`allow domain system_data_file:dir getattr;')
+ ###
+ 
+ # All socket ioctls must be restricted to a whitelist.
+-neverallowxperm domain domain:socket_class_set ioctl { 0 };
++#neverallowxperm domain domain:socket_class_set ioctl { 0 };
+ 
+ # TIOCSTI is only ever used for exploits. Block it.
+ # b/33073072, b/7530569
+ # http://www.openwall.com/lists/oss-security/2016/09/26/14
+-neverallowxperm * devpts:chr_file ioctl TIOCSTI;
++#neverallowxperm * devpts:chr_file ioctl TIOCSTI;
+ 
+ # Do not allow any domain other than init or recovery to create unlabeled files.
+ neverallow { domain -init -recovery } unlabeled:dir_file_class_set create;
+diff --git a/public/mediadrmserver.te b/public/mediadrmserver.te
+index 123cb29..c1a46f3 100644
+--- a/public/mediadrmserver.te
++++ b/public/mediadrmserver.te
+@@ -28,4 +28,4 @@ binder_call(mediadrmserver, mediacodec)
+ neverallow mediadrmserver { file_type fs_type }:file execute_no_trans;
+ 
+ # do not allow privileged socket ioctl commands
+-neverallowxperm mediadrmserver domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
++#neverallowxperm mediadrmserver domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
+diff --git a/public/mediaserver.te b/public/mediaserver.te
+index 6efaf0f..c245330 100644
+--- a/public/mediaserver.te
++++ b/public/mediaserver.te
+@@ -115,8 +115,8 @@ allow mediaserver drmserver:drmservice {
+ };
+ 
+ # only allow unprivileged socket ioctl commands
+-allowxperm mediaserver self:{ rawip_socket tcp_socket udp_socket }
+-  ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
++#allowxperm mediaserver self:{ rawip_socket tcp_socket udp_socket }
++#  ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
+ 
+ # Access to /data/media.
+ # This should be removed if sdcardfs is modified to alter the secontext for its
+@@ -147,4 +147,4 @@ binder_call(mediaserver, mediacodec)
+ neverallow mediaserver { file_type fs_type }:file execute_no_trans;
+ 
+ # do not allow privileged socket ioctl commands
+-neverallowxperm mediaserver domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
++#neverallowxperm mediaserver domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
+diff --git a/public/shell.te b/public/shell.te
+index 9540cca..65a4f26 100644
+--- a/public/shell.te
++++ b/public/shell.te
+@@ -170,7 +170,7 @@ allow shell sepolicy_file:file r_file_perms;
+ neverallow shell file_type:file link;
+ 
+ # Do not allow privileged socket ioctl commands
+-neverallowxperm shell domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
++#neverallowxperm shell domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
+ 
+ # limit shell access to sensitive char drivers to
+ # only getattr required for host side test.
